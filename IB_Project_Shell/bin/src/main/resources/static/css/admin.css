@@ -1,0 +1,120 @@
+html,body {
+ 	background-image: url("https://images.wallpapersden.com/image/download/4k-natural-gradient_67713_3840x2160.jpg");
+  	background-size: cover;
+  	background-repeat: no-repeat;
+}
+
+#myContainer {
+    background: rgba(0,0,0,0.7);
+    margin-top: 70px;
+    height: 370px;
+    width: 370px;
+    margin-bottom: 100px;
+}
+
+#cardHeader {
+	font-size: 40px;
+	color: white;
+}
+
+.margina {
+  margin-right: 20px;
+}
+
+.myLabelText {
+    color: white;
+}
+
+body {overflow-x: hidden;}
+
+a { 
+    font-size: 18px;
+    width: max-content;
+    color: white;
+}
+
+a:hover {
+    color: white;
+}
+
+#emailInput{width:200px;}
+
+section{
+    color: white;
+    font-family: sans-serif;
+    background: linear-gradient(
+        #343a40,
+        rgba(105, 151, 176, 0.95)
+      ), #343a40;
+    background-size: cover;
+    background-position: top;
+    width: 100vw;
+    height: 105vh;
+    padding: 75px 200px;
+    text-align: center;
+}
+
+#title{
+    margin-top: 8vh;
+    color: white;
+    font-weight: 600;
+    font-size: 50px;
+    font-family: 'Roboto', sans-serif;
+    background-color: none;
+    margin-bottom: 10vh;
+}
+
+#buttonSearch{
+    color: rgba(255, 255, 255, 0.60);
+    font-family: sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    position: absolute;
+    cursor:pointer;
+    user-select: none;
+}
+
+#buttonSearch:hover{
+    color: white;
+}
+
+#search{
+    display: none;
+    margin-top: 7vh;
+    padding: 10px;
+    border-radius: 10px;
+    background: #f16268;
+    float: left;
+}
+
+#searchButton{
+    background-color: #343a40;
+    border: none;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.my-custom-scrollbar {
+    float: left;
+    width: 100%;
+    height: 400px;
+    overflow: auto;
+    margin-top: 5vh;
+}
+
+.table-wrapper-scroll-y {
+    display: block;
+}
+
+#userTable{
+    background-color: #343a40;
+}
+
+#userTableHeader{
+    background: #f16268;
+    color: white;
+}

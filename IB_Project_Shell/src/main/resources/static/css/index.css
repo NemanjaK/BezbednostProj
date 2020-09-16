@@ -1,0 +1,48 @@
+html,body{
+background-image: url('https://images.wallpapersden.com/image/download/kde-plasma-5-20_73014_1920x1200.jpg');
+background-size: cover;
+background-repeat: no-repeat;
+height: 100%;
+}
+
+.container{
+height: 100%;
+align-content: center;
+}
+
+.card{
+height: 300px;
+margin-top: auto;
+margin-bottom: auto;
+width: 400px;
+background-color: rgba(0,0,0,0.5) !important;
+}
+
+.card-header h3{
+color: white;
+}
+
+input:focus{
+outline: 0 0 0 0  !important;
+box-shadow: 0 0 0 0 !important;
+
+}
+
+.login_btn{
+color: white;
+background-color: #054873;
+width: 100px;
+}
+
+.login_btn:hover{
+color: white;
+background-color: #0097dc;
+}
+
+.links{
+color: white;
+}
+
+.links a{
+margin-left: 4px;
+}
