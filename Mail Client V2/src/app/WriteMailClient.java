@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.security.Key;
 import java.security.KeyStore;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -13,10 +15,14 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.log4j.BasicConfigurator;
+
 import com.google.api.services.gmail.Gmail;
 
+import model.keystore.KeyStoreReader;
 import model.mailclient.MailBody;
 import util.Base64;
+import util.DataUtil;
 import util.GzipUtil;
 import util.IVHelper;
 import support.MailHelper;
@@ -24,9 +30,9 @@ import support.MailWritter;
 
 public class WriteMailClient extends MailClient {
 	
-	private static final String USERA_KEYSTORE = "./data/usera-keystore.jks";
-	
 	public static void main(String[] args) {
+		BasicConfigurator.configure();
+
 		
         try {
         	Gmail service = getGmailService();
@@ -41,6 +47,8 @@ public class WriteMailClient extends MailClient {
             System.out.println("Insert body:");
             String body = reader.readLine();
             
+			DataUtil.generateXML(reciever, subject, body);
+
             
             //Compression
             String compressedSubject = Base64.encodeToString(GzipUtil.compress(subject));
@@ -71,16 +79,16 @@ public class WriteMailClient extends MailClient {
 			System.out.println("Kriptovan subject: " + ciphersubjectStr);
 			
 			//Keystore
-			char[] pwdArrayA = "usera".toCharArray();
-			KeyStore ks = KeyStore.getInstance("JKS");
-			ks.load(new FileInputStream(USERA_KEYSTORE), pwdArrayA);
+			KeyStoreReader keyStoreReader = new KeyStoreReader();
 			
-			java.security.cert.Certificate userb_cer = ks.getCertificate("userb-cer");
-			Key userb_key = userb_cer.getPublicKey();
-			
+			KeyStore keyStoreA = keyStoreReader.readKeyStore("./data/usera.jks", "123".toCharArray());
+						
+			Certificate cerB = keyStoreA.getCertificate("userb");
+			PublicKey publicKeyUserB = keyStoreReader.getPublicKeyFromKeyStore(cerB);
+								
 			//inicijalizacija za sifrovanje 
 			Cipher rsaCipherEnc = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-			rsaCipherEnc.init(Cipher.ENCRYPT_MODE, userb_key);
+			rsaCipherEnc.init(Cipher.ENCRYPT_MODE, publicKeyUserB);
 
 			//sifrovanje
 			byte[] cipherkey = rsaCipherEnc.doFinal(secretKey.getEncoded());

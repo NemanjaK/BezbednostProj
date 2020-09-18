@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +28,18 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.log4j.BasicConfigurator;
+import org.w3c.dom.Document;
+
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 
+import model.keystore.KeyStoreReader;
 import model.mailclient.MailBody;
 import support.MailHelper;
 import support.MailReader;
 import util.Base64;
+import util.DataUtil;
 import util.GzipUtil;
 
 public class ReadMailClient extends MailClient {
@@ -44,10 +50,12 @@ public class ReadMailClient extends MailClient {
 	private static final String USERB_KEYSTORE = "./data/userb-keystore.jks";
 	
 	public static void main(String[] args) throws IOException, InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException, IllegalBlockSizeException, BadPaddingException, MessagingException, NoSuchPaddingException, InvalidAlgorithmParameterException, KeyStoreException, CertificateException, UnrecoverableKeyException {
-        // Build a new authorized API client service.
+		BasicConfigurator.configure();
+
+		// Build a new authorized API client service.
         Gmail service = getGmailService();
         ArrayList<MimeMessage> mimeMessages = new ArrayList<MimeMessage>();
-        
+
         String user = "me";
         String query = "is:unread label:INBOX";
         
@@ -93,15 +101,12 @@ public class ReadMailClient extends MailClient {
 		String text = mailBody.getEncMessage();
 		
 		//Keystore
-		char[] pwdArrayB = "userb".toCharArray();
-		KeyStore ks = KeyStore.getInstance("JKS");
-		
-		BufferedInputStream in = new BufferedInputStream(new FileInputStream(USERB_KEYSTORE));
-		ks.load(in, pwdArrayB);
-		PrivateKey pk = (PrivateKey) ks.getKey("userb", pwdArrayB);
+		KeyStoreReader keyStoreReader = new KeyStoreReader();
+		KeyStore keyStore = keyStoreReader.readKeyStore("./data/userb.jks", "123".toCharArray());
+		PrivateKey privateKey = keyStoreReader.getPrivateKeyFromKeyStore(keyStore, "userb", "123".toCharArray());
 		
 		Cipher rsaCipherDec = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-		rsaCipherDec.init(Cipher.DECRYPT_MODE, pk);
+		rsaCipherDec.init(Cipher.DECRYPT_MODE, privateKey);
 		byte[] decryptedKey = rsaCipherDec.doFinal(secretKeyEnc);
 		
 		SecretKey secretKey = new SecretKeySpec(decryptedKey, "AES");
@@ -122,5 +127,31 @@ public class ReadMailClient extends MailClient {
 		String decryptedSubjectTxt = new String(aesCipherDec.doFinal(Base64.decode(chosenMessage.getSubject())));
 		String decompressedSubjectTxt = GzipUtil.decompress(Base64.decode(decryptedSubjectTxt));
 		System.out.println("Subject text: " + new String(decompressedSubjectTxt));
+		
+		Document doc = DataUtil.loadDocument();
+
+		X509Certificate cer = (X509Certificate) keyStoreReader.getCertificateFromKeyStore(keyStore, "usera");
+		
+		if(DataUtil.verifySiganture(doc, cer)) {
+			
+			System.out.println(".... verification is successful");
+		}
+		
+		System.out.println("");
+		System.out.println("<-----TEST CASE FOR CHANGED MESSAGE CONTENT-irregular signature------>");
+		
+		System.out.println("Changing message content....");
+		
+		doc.getElementsByTagName("subject").item(0).setTextContent("changed content");
+		
+		if(!DataUtil.verifySiganture(doc, cer)) {
+			
+			System.out.println(".... verification is failed");
+			System.out.println("");
+		}
+		
+		System.out.println("Body text: " + decompressedBodyText);
+		System.out.println("Subject text: " + new String(decompressedSubjectTxt));
+		
 	}
 }
