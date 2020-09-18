@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><root><message><recipient>milos0rnic@gmail.com</recipient><subject>aa</subject><body>aa</body></message><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><root><message><recipient>milos0rnic@gmail.com</recipient><subject>TEST</subject><body>testiranje..</body></message><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
 <ds:SignedInfo>
 <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
 <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
@@ -8,15 +8,15 @@
 <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#WithComments"/>
 </ds:Transforms>
 <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-<ds:DigestValue>ki3Seh/dJ3hAK2uy3KshN15dyKE=</ds:DigestValue>
+<ds:DigestValue>s+fjMnpsec98S8tzocOugyWN0xg=</ds:DigestValue>
 </ds:Reference>
 </ds:SignedInfo>
 <ds:SignatureValue>
-bSHsYj+Xq3WVGcZM1T4lF5lCvIf4opKol4+QPldR6JQM9XiJumx39s/vE2z25Nd3NKigDfrXxVGJ
-b2GmfSAqu3eMMNPN+iLvhWCBNqFb+vszim3swb3dz5BiQ8lUyYSN0H5DfkuxgWzcCsnJsbanaxnQ
-hzzAsFWUyUsQt1Iadp66jaiWHpPwOWsdiDnHEEUUTpHovGJw3MkunjBM6UiPBSH+u5pTuWNEiXTM
-LZojJxzRKwwTJkNGiavcwiaKQNIU2/8NdO2OEAziWF8U6BXFhrLAtjlK1+TRljnEbwi5ueJ0BRoK
-u09CPg6j9wkUlUljn+sIsJnSlWeCM1l+LtC0JQ==
+K/zKoHntUJs1qM68PZ4CNNdppyrbv1BtkHlFeOYEi+UYQAQG4DiNEbWfSDLPm//kzMCdE1Rcrs6G
+pC47XHcZDtevaQP88PBkSWDfhmPYyWL5UqGkLsiQPRtinqK76pptrev1nk341aC0RDdoqCUXiptg
+L/SR/It78JOr9gsAA3ZXw1xuHYtBUICu9HpAvvpUQreZJElrrMXG86KRi6hVMey+Icz3vvuGbW5G
+ZtGO/ueoL4gCeOm8JlRXMiZNWackBOt3o69cH5balu3Z34B5O8mhtpYCfZzB6CDYWB2ihxr43KZi
+fByBdSUbctgu4ryAoel0a4zextmsqcNC74yB+g==
 </ds:SignatureValue>
 <ds:KeyInfo>
 <ds:KeyValue>
