@@ -31,8 +31,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import model.keystore.KeyStoreReader;
-
 public class DataUtil {
 
 	static {

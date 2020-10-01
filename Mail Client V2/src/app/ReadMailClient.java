@@ -28,11 +28,12 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.log4j.BasicConfigurator;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 
-import model.keystore.KeyStoreReader;
 import model.mailclient.MailBody;
 import support.MailHelper;
 import support.MailReader;
@@ -41,6 +42,7 @@ import util.DataUtil;
 import util.GzipUtil;
 import xml.AsymmetricKeyDecryption;
 import xml.AsymmetricKeyEncryption;
+import xml.SignEnveloped;
 import xml.VerifySignatureEnveloped;
 
 public class ReadMailClient extends MailClient {
@@ -92,77 +94,37 @@ public class ReadMailClient extends MailClient {
 	    Integer answer = Integer.parseInt(answerStr);
 	    
 		MimeMessage chosenMessage = mimeMessages.get(answer);
-		AsymmetricKeyDecryption.testIt(sender, reciever);
-
-		VerifySignatureEnveloped.testIt(sender);
-
-		System.out.println("From: " + sender);
-		Document doc = AsymmetricKeyEncryption.loadDocument("./data/" + sender + "_dec.xml");
-		MailHelper.printEmail(doc);
-
-//        //TODO: Decrypt a message and decompress it. The private key is stored in a file.
-//		Cipher aesCipherDec = Cipher.getInstance("AES/CBC/PKCS5Padding");
-//		//SecretKey secretKey = new SecretKeySpec(JavaUtils.getBytesFromFile(KEY_FILE), "AES");
-//		
-//		//Izvlacenje enkriptovane poruke, tajnog kljuca i inicijalizacionih vektora
-//		MailBody mailBody = new MailBody(MailHelper.getText(chosenMessage));
-//		IvParameterSpec ivParameterSpec1 = new IvParameterSpec(mailBody.getIV1Bytes());
-//		IvParameterSpec ivParameterSpec2 = new IvParameterSpec(mailBody.getIV2Bytes());
-//		byte[] secretKeyEnc = mailBody.getEncKeyBytes();
-//		String text = mailBody.getEncMessage();
-//		
-//		//Keystore
-//		KeyStoreReader keyStoreReader = new KeyStoreReader();
-//		KeyStore keyStore = keyStoreReader.readKeyStore("./data/userb.jks", "123".toCharArray());
-//		PrivateKey privateKey = keyStoreReader.getPrivateKeyFromKeyStore(keyStore, "userb", "123".toCharArray());
-//		
-//		Cipher rsaCipherDec = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-//		rsaCipherDec.init(Cipher.DECRYPT_MODE, privateKey);
-//		byte[] decryptedKey = rsaCipherDec.doFinal(secretKeyEnc);
-//		
-//		SecretKey secretKey = new SecretKeySpec(decryptedKey, "AES");
-//		System.out.println("Dekriptovan kljuc: " + secretKey.hashCode());
-//		
-//		//inicijalizacija za dekriptovanje
-//		aesCipherDec.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec1);
-//		
-//		//dekompresovanje i dekriptovanje teksta
-//		String receivedBodyTxt = new String(aesCipherDec.doFinal(Base64.decode(text)));
-//		String decompressedBodyText = GzipUtil.decompress(Base64.decode(receivedBodyTxt));
-//		System.out.println("Body text: " + decompressedBodyText);
-//		
-//		//inicijalizacija za dekriptovanje
-//		aesCipherDec.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec2);
-//		
-//		//dekompresovanje i dekriptovanje subject-a
-//		String decryptedSubjectTxt = new String(aesCipherDec.doFinal(Base64.decode(chosenMessage.getSubject())));
-//		String decompressedSubjectTxt = GzipUtil.decompress(Base64.decode(decryptedSubjectTxt));
-//		System.out.println("Subject text: " + new String(decompressedSubjectTxt));
-//		
-//		Document doc = DataUtil.loadDocument();
-//
-//		X509Certificate cer = (X509Certificate) keyStoreReader.getCertificateFromKeyStore(keyStore, "usera");
-//		
-//		if(DataUtil.verifySiganture(doc, cer)) {
-//			
-//			System.out.println(".... verification is successful");
-//		}
-//		
-//		System.out.println("");
-//		System.out.println("<-----TEST CASE FOR CHANGED MESSAGE CONTENT-irregular signature------>");
-//		
-//		System.out.println("Changing message content....");
-//		
-//		doc.getElementsByTagName("subject").item(0).setTextContent("changed content");
-//		
-//		if(!DataUtil.verifySiganture(doc, cer)) {
-//			
-//			System.out.println(".... verification is failed");
-//			System.out.println("");
-//		}
-//		
-//		System.out.println("Body text: " + decompressedBodyText);
-//		System.out.println("Subject text: " + new String(decompressedSubjectTxt));
 		
+    	Document doc = AsymmetricKeyDecryption.loadDocument(sender);
+		PrivateKey pk = AsymmetricKeyDecryption.readPrivateKey();           
+		System.out.println("Decrypting....");
+		doc = AsymmetricKeyDecryption.decrypt(doc, pk);
+		AsymmetricKeyDecryption.saveDocument(doc, sender);
+		System.out.println("Decryption done\n");
+
+		Document doc2 = VerifySignatureEnveloped.loadDocument(sender);
+		boolean res = VerifySignatureEnveloped.verifySignature(doc2);
+		System.out.println("Verification = " + res + "\n");
+
+		// opet proverava potpis, ali je dokument menjan
+		System.out.println("");
+		System.out.println("<-----TEST CASE FOR CHANGED MESSAGE CONTENT-irregular signature------>");
+		
+		System.out.println("Changing message content....");
+		Node fc = doc2.getFirstChild();
+		NodeList list = fc.getChildNodes();
+		for (int i = 0; i <list.getLength(); i++) {
+			Node node = list.item(i);
+			if("subject".equals(node.getNodeName())) {
+				node.setTextContent("changed subject");
+			}
+		}
+		boolean res1 = VerifySignatureEnveloped.verifySignature(doc2);
+		System.out.println("Verification = " + res1 + "\n");
+		
+		
+		System.out.println("From: " + sender);
+		Document docum = AsymmetricKeyEncryption.loadDocument(sender);
+		MailHelper.printEmail(docum);
 	}
 }

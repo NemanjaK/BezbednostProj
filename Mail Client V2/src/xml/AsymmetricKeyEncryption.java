@@ -27,8 +27,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import model.keystore.KeyStoreReader;
-
 
 public class AsymmetricKeyEncryption {
 	
@@ -41,35 +39,18 @@ public class AsymmetricKeyEncryption {
 		Security.addProvider(new BouncyCastleProvider());
 		org.apache.xml.security.Init.init();
 	}
-
-	public static void testIt(String senderEmail, String recieverEmail) {
-		String inFile = "./data/" + senderEmail + "_signed.xml";
-		String outFile = "./data/" + senderEmail + "_enc.xml";
-		
-		Document doc = loadDocument(inFile);
-		
-		System.out.println("Generating secret key ....");
-		SecretKey secretKey = generateDataEncryptionKey();
-		
-		Certificate cert = readCertificate();
-		
-		System.out.println("Encrypting....");
-		doc = encrypt(doc, secretKey, cert);
-		
-		saveDocument(doc, outFile);
-		
-		System.out.println("Encryption done");
-	}
-
 	/**
 	 * Kreira DOM od XML dokumenta
 	 */
-	public static Document loadDocument(String file) {
+	public static Document loadDocument(String senderEmail) {
+		
+		String inFile = "./data/" + senderEmail + "_signed.xml";
+		
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setNamespaceAware(true);
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document document = db.parse(new File(file));
+			Document document = db.parse(new File(inFile));
 
 			return document;
 		} catch (Exception e) {
@@ -81,7 +62,7 @@ public class AsymmetricKeyEncryption {
 	/**
 	 * Ucitava sertifikat is KS fajla alias primer
 	 */
-	private static Certificate readCertificate() {
+	public static Certificate readCertificate() {
 		try {
 
 			// kreiramo instancu KeyStore
@@ -106,10 +87,12 @@ public class AsymmetricKeyEncryption {
 	/**
 	 * Snima DOM u XML fajl
 	 */
-	private static void saveDocument(Document doc, String fileName) {
+	public static void saveDocument(Document doc, String senderEmail) {
+		String outFile = "./data/" + senderEmail + "_enc.xml";
+
 		try {
-			File outFile = new File(fileName);
-			FileOutputStream f = new FileOutputStream(outFile);
+			File outFileF = new File(outFile);
+			FileOutputStream f = new FileOutputStream(outFileF);
 
 			TransformerFactory factory = TransformerFactory.newInstance();
 			Transformer transformer = factory.newTransformer();
@@ -120,7 +103,7 @@ public class AsymmetricKeyEncryption {
 			transformer.transform(source, result);
 
 			f.close();
-
+			System.out.println("Saved");
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
@@ -129,7 +112,7 @@ public class AsymmetricKeyEncryption {
 	/**
 	 * Generise tajni kljuc
 	 */
-	private static SecretKey generateDataEncryptionKey() {
+	public static SecretKey generateDataEncryptionKey() {
 
 		try {
 			KeyGenerator keyGenerator = KeyGenerator.getInstance("DESede"); // Triple
@@ -145,7 +128,7 @@ public class AsymmetricKeyEncryption {
 	/**
 	 * Kriptuje sadrzaj prvog elementa odsek
 	 */
-	private static Document encrypt(Document doc, SecretKey key, Certificate certificate) {
+	public static Document encrypt(Document doc, SecretKey key, Certificate certificate) {
 
 		try {
 

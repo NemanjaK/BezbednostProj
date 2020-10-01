@@ -21,50 +21,23 @@ import org.w3c.dom.NodeList;
 //Vrsi proveru potpisa
 public class VerifySignatureEnveloped {
 	
-	private static final String IN_FILE = "./data/univerzitet_signed1.xml";
 	
     static {
     	//staticka inicijalizacija
         Security.addProvider(new BouncyCastleProvider());
         org.apache.xml.security.Init.init();
-    }
-	
-	public static void testIt(String senderEmail) {
-		String inFile = "./data/" + senderEmail + "_dec.xml";
-		
-		// ucitava se dokument
-		Document doc = loadDocument(inFile);
-		
-		// proverava potpis
-		boolean res = verifySignature(doc);
-		System.out.println("Verification = " + res + "\n");
-		
-		// opet proverava potpis, ali je dokument menjan
-		System.out.println("");
-		System.out.println("<-----TEST CASE FOR CHANGED MESSAGE CONTENT-irregular signature------>");
-		
-		System.out.println("Changing message content....");
-		Node fc = doc.getFirstChild();
-		NodeList list = fc.getChildNodes();
-		for (int i = 0; i <list.getLength(); i++) {
-			Node node = list.item(i);
-			if("subject".equals(node.getNodeName())) {
-				node.setTextContent("changed subject");
-			}
-		}
-		boolean res1 = verifySignature(doc);
-		System.out.println("Verification = " + res1 + "\n");
-	}
-	
+    }		
 	/**
 	 * Kreira DOM od XML dokumenta
 	 */
-	private static Document loadDocument(String file) {
+	public static Document loadDocument(String senderEmail) {
+		String inFile = "./data/" + senderEmail + "_dec.xml";
+
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setNamespaceAware(true);
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document document = db.parse(new File(file));
+			Document document = db.parse(new File(inFile));
 
 			return document;
 		} catch (Exception e) {
@@ -73,7 +46,7 @@ public class VerifySignatureEnveloped {
 		}
 	}
 	
-	private static boolean verifySignature(Document doc) {
+	public static boolean verifySignature(Document doc) {
 		
 		try {
 			//Pronalazi se prvi Signature element 

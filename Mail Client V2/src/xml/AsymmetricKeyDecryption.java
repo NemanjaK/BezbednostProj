@@ -33,31 +33,17 @@ public class AsymmetricKeyDecryption {
 		Security.addProvider(new BouncyCastleProvider());
 		org.apache.xml.security.Init.init();
 	}
-
-	public static void testIt(String senderEmail, String recieverEmail) {
-		String inFile = "./data/" + senderEmail + "_enc.xml";
-		String outFile = "./data/" + senderEmail + "_dec.xml";
-		
-		Document doc = loadDocument(inFile);
-
-		PrivateKey pk = readPrivateKey();
-
-		System.out.println("Decrypting....");
-		doc = decrypt(doc, pk);
-
-		saveDocument(doc, outFile);
-		System.out.println("Decryption done\n");
-	}
-
 	/**
 	 * Kreira DOM od XML dokumenta
 	 */
-	private static Document loadDocument(String file) {
+	public static Document loadDocument(String senderEmail) {
+		String inFile = "./data/" + senderEmail + "_enc.xml";
+
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setNamespaceAware(true);
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document document = db.parse(new File(file));
+			Document document = db.parse(new File(inFile));
 
 			return document;
 		} catch (Exception e) {
@@ -69,10 +55,12 @@ public class AsymmetricKeyDecryption {
 	/**
 	 * Snima DOM u XML fajl
 	 */
-	private static void saveDocument(Document doc, String fileName) {
+	public static void saveDocument(Document doc, String senderEmail) {
+		String outFile = "./data/" + senderEmail + "_dec.xml";
+
 		try {
-			File outFile = new File(fileName);
-			FileOutputStream f = new FileOutputStream(outFile);
+			File outFilef = new File(outFile);
+			FileOutputStream f = new FileOutputStream(outFilef);
 
 			TransformerFactory factory = TransformerFactory.newInstance();
 			Transformer transformer = factory.newTransformer();
@@ -92,7 +80,7 @@ public class AsymmetricKeyDecryption {
 	/**
 	 * Ucitava privatni kljuc is KS fajla alias primer
 	 */
-	private static PrivateKey readPrivateKey() {
+	public static PrivateKey readPrivateKey() {
 		try {
 
 			// kreiramo instancu KeyStore
@@ -117,7 +105,7 @@ public class AsymmetricKeyDecryption {
 	/**
 	 * Kriptuje sadrzaj prvog elementa odsek
 	 */
-	private static Document decrypt(Document doc, PrivateKey privateKey) {
+	public static Document decrypt(Document doc, PrivateKey privateKey) {
 
 		try {
 			// cipher za dekritpovanje XML-a

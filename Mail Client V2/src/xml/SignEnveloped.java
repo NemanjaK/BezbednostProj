@@ -26,9 +26,8 @@ import org.w3c.dom.Element;
 
 //Potpisuje dokument, koristi se enveloped tip
 public class SignEnveloped {
-	
-	//private static final String IN_FILE = "./data/univerzitet.xml";
-	//private static final String OUT_FILE = "./data/univerzitet_signed1.xml";
+	// SMISLITI STRUKTURU KODA TAKO DA RADI BEZ testIt()
+	private static final String OUT_FILE = "./data/univerzitet_signed1.xml";
 	private static final String KEY_STORE_FILE = "./data/usera.jks";
 	
   static {
@@ -37,34 +36,17 @@ public class SignEnveloped {
       org.apache.xml.security.Init.init();
   }
 	
-	public static void testIt(String senderEmail) {
-		
-		String inFile = "./data/" + senderEmail + ".xml";
-		String outFile = "./data/" + senderEmail + "_signed.xml";
-		
-		Document doc = loadDocument(inFile);
-		
-		PrivateKey pk = readPrivateKey();
-
-		Certificate cert = readCertificate();
-		
-		System.out.println("Signing....");
-		doc = signDocument(doc, pk, cert);
-		
-		//snima se dokument
-		saveDocument(doc, outFile);
-		System.out.println("Signing of document done");
-	}
-	
 	/**
 	 * Kreira DOM od XML dokumenta
 	 */
-	private static Document loadDocument(String file) {
+	public static Document loadDocument(String senderEmail) {
+		
+		String inFile = "./data/" + senderEmail + ".xml";
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setNamespaceAware(true);
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document document = db.parse(new File(file));
+			Document document = db.parse(new File(inFile));
 
 			return document;
 		} catch (Exception e) {
@@ -76,10 +58,12 @@ public class SignEnveloped {
 	/**
 	 * Snima DOM u XML fajl 
 	 */
-	private static void saveDocument(Document doc, String fileName) {
+	public static void saveDocument(Document doc, String senderEmail) {
+		
+		String outFile = "./data/" + senderEmail + "_signed.xml";
 		try {
-			File outFile = new File(fileName);
-			FileOutputStream f = new FileOutputStream(outFile);
+			File outFilef = new File(outFile);
+			FileOutputStream f = new FileOutputStream(outFilef);
 
 			TransformerFactory factory = TransformerFactory.newInstance();
 			Transformer transformer = factory.newTransformer();
@@ -100,7 +84,7 @@ public class SignEnveloped {
 	 * Ucitava sertifikat is KS fajla
 	 * alias primer
 	 */
-	private static Certificate readCertificate() {
+	public static Certificate readCertificate() {
 		try {
 			//kreiramo instancu KeyStore
 			KeyStore ks = KeyStore.getInstance("JKS", "SUN");
@@ -127,7 +111,7 @@ public class SignEnveloped {
 	 * Ucitava privatni kljuc is KS fajla
 	 * alias primer
 	 */
-	private static PrivateKey readPrivateKey() {
+	public static PrivateKey readPrivateKey() {
 		try {
 			//kreiramo instancu KeyStore
 			KeyStore ks = KeyStore.getInstance("JKS", "SUN");
@@ -149,7 +133,7 @@ public class SignEnveloped {
 		}
 	}
 	
-	private static Document signDocument(Document doc, PrivateKey privateKey, Certificate cert) {
+	public static Document signDocument(Document doc, PrivateKey privateKey, Certificate cert) {
       
       try {
 			Element rootEl = doc.getDocumentElement();
