@@ -39,14 +39,16 @@ import support.MailReader;
 import util.Base64;
 import util.DataUtil;
 import util.GzipUtil;
+import xml.AsymmetricKeyDecryption;
+import xml.AsymmetricKeyEncryption;
+import xml.VerifySignatureEnveloped;
 
 public class ReadMailClient extends MailClient {
 
-	public static long PAGE_SIZE = 3;
+	public static long PAGE_SIZE = 2;
 	public static boolean ONLY_FIRST_PAGE = true;
 	
 	public static void main(String[] args) throws IOException, InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException, IllegalBlockSizeException, BadPaddingException, MessagingException, NoSuchPaddingException, InvalidAlgorithmParameterException, KeyStoreException, CertificateException, UnrecoverableKeyException {
-		BasicConfigurator.configure();
 
 		// Build a new authorized API client service.
         Gmail service = getGmailService();
@@ -54,6 +56,9 @@ public class ReadMailClient extends MailClient {
 
         String user = "me";
         String query = "is:unread label:INBOX";
+        
+        String sender = "";
+        String reciever = "";
         
         List<Message> messages = MailReader.listMessagesMatchingQuery(service, user, query, PAGE_SIZE, ONLY_FIRST_PAGE);
         for(int i=0; i<messages.size(); i++) {
@@ -64,8 +69,11 @@ public class ReadMailClient extends MailClient {
 				
 				mimeMessage = MailReader.getMimeMessage(service, user, fullM.getId());
 				
+				sender = mimeMessage.getHeader("From", null);
+				reciever = mimeMessage.getHeader("To", null);
+				
 				System.out.println("\nMessage number " + i);
-				System.out.println("From: " + mimeMessage.getHeader("From", null));
+				System.out.println("From: " + sender);
 				System.out.println("Subject: " + mimeMessage.getSubject());
 				System.out.println("Body: " + MailHelper.getText(mimeMessage));
 				System.out.println("\n");
@@ -84,70 +92,77 @@ public class ReadMailClient extends MailClient {
 	    Integer answer = Integer.parseInt(answerStr);
 	    
 		MimeMessage chosenMessage = mimeMessages.get(answer);
-	    
-        //TODO: Decrypt a message and decompress it. The private key is stored in a file.
-		Cipher aesCipherDec = Cipher.getInstance("AES/CBC/PKCS5Padding");
-		//SecretKey secretKey = new SecretKeySpec(JavaUtils.getBytesFromFile(KEY_FILE), "AES");
-		
-		//Izvlacenje enkriptovane poruke, tajnog kljuca i inicijalizacionih vektora
-		MailBody mailBody = new MailBody(MailHelper.getText(chosenMessage));
-		IvParameterSpec ivParameterSpec1 = new IvParameterSpec(mailBody.getIV1Bytes());
-		IvParameterSpec ivParameterSpec2 = new IvParameterSpec(mailBody.getIV2Bytes());
-		byte[] secretKeyEnc = mailBody.getEncKeyBytes();
-		String text = mailBody.getEncMessage();
-		
-		//Keystore
-		KeyStoreReader keyStoreReader = new KeyStoreReader();
-		KeyStore keyStore = keyStoreReader.readKeyStore("./data/userb.jks", "123".toCharArray());
-		PrivateKey privateKey = keyStoreReader.getPrivateKeyFromKeyStore(keyStore, "userb", "123".toCharArray());
-		
-		Cipher rsaCipherDec = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-		rsaCipherDec.init(Cipher.DECRYPT_MODE, privateKey);
-		byte[] decryptedKey = rsaCipherDec.doFinal(secretKeyEnc);
-		
-		SecretKey secretKey = new SecretKeySpec(decryptedKey, "AES");
-		System.out.println("Dekriptovan kljuc: " + secretKey.hashCode());
-		
-		//inicijalizacija za dekriptovanje
-		aesCipherDec.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec1);
-		
-		//dekompresovanje i dekriptovanje teksta
-		String receivedBodyTxt = new String(aesCipherDec.doFinal(Base64.decode(text)));
-		String decompressedBodyText = GzipUtil.decompress(Base64.decode(receivedBodyTxt));
-		System.out.println("Body text: " + decompressedBodyText);
-		
-		//inicijalizacija za dekriptovanje
-		aesCipherDec.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec2);
-		
-		//dekompresovanje i dekriptovanje subject-a
-		String decryptedSubjectTxt = new String(aesCipherDec.doFinal(Base64.decode(chosenMessage.getSubject())));
-		String decompressedSubjectTxt = GzipUtil.decompress(Base64.decode(decryptedSubjectTxt));
-		System.out.println("Subject text: " + new String(decompressedSubjectTxt));
-		
-		Document doc = DataUtil.loadDocument();
+		AsymmetricKeyDecryption.testIt(sender, reciever);
 
-		X509Certificate cer = (X509Certificate) keyStoreReader.getCertificateFromKeyStore(keyStore, "usera");
-		
-		if(DataUtil.verifySiganture(doc, cer)) {
-			
-			System.out.println(".... verification is successful");
-		}
-		
-		System.out.println("");
-		System.out.println("<-----TEST CASE FOR CHANGED MESSAGE CONTENT-irregular signature------>");
-		
-		System.out.println("Changing message content....");
-		
-		doc.getElementsByTagName("subject").item(0).setTextContent("changed content");
-		
-		if(!DataUtil.verifySiganture(doc, cer)) {
-			
-			System.out.println(".... verification is failed");
-			System.out.println("");
-		}
-		
-		System.out.println("Body text: " + decompressedBodyText);
-		System.out.println("Subject text: " + new String(decompressedSubjectTxt));
+		VerifySignatureEnveloped.testIt(sender);
+
+		System.out.println("From: " + sender);
+		Document doc = AsymmetricKeyEncryption.loadDocument("./data/" + sender + "_dec.xml");
+		MailHelper.printEmail(doc);
+
+//        //TODO: Decrypt a message and decompress it. The private key is stored in a file.
+//		Cipher aesCipherDec = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//		//SecretKey secretKey = new SecretKeySpec(JavaUtils.getBytesFromFile(KEY_FILE), "AES");
+//		
+//		//Izvlacenje enkriptovane poruke, tajnog kljuca i inicijalizacionih vektora
+//		MailBody mailBody = new MailBody(MailHelper.getText(chosenMessage));
+//		IvParameterSpec ivParameterSpec1 = new IvParameterSpec(mailBody.getIV1Bytes());
+//		IvParameterSpec ivParameterSpec2 = new IvParameterSpec(mailBody.getIV2Bytes());
+//		byte[] secretKeyEnc = mailBody.getEncKeyBytes();
+//		String text = mailBody.getEncMessage();
+//		
+//		//Keystore
+//		KeyStoreReader keyStoreReader = new KeyStoreReader();
+//		KeyStore keyStore = keyStoreReader.readKeyStore("./data/userb.jks", "123".toCharArray());
+//		PrivateKey privateKey = keyStoreReader.getPrivateKeyFromKeyStore(keyStore, "userb", "123".toCharArray());
+//		
+//		Cipher rsaCipherDec = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+//		rsaCipherDec.init(Cipher.DECRYPT_MODE, privateKey);
+//		byte[] decryptedKey = rsaCipherDec.doFinal(secretKeyEnc);
+//		
+//		SecretKey secretKey = new SecretKeySpec(decryptedKey, "AES");
+//		System.out.println("Dekriptovan kljuc: " + secretKey.hashCode());
+//		
+//		//inicijalizacija za dekriptovanje
+//		aesCipherDec.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec1);
+//		
+//		//dekompresovanje i dekriptovanje teksta
+//		String receivedBodyTxt = new String(aesCipherDec.doFinal(Base64.decode(text)));
+//		String decompressedBodyText = GzipUtil.decompress(Base64.decode(receivedBodyTxt));
+//		System.out.println("Body text: " + decompressedBodyText);
+//		
+//		//inicijalizacija za dekriptovanje
+//		aesCipherDec.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec2);
+//		
+//		//dekompresovanje i dekriptovanje subject-a
+//		String decryptedSubjectTxt = new String(aesCipherDec.doFinal(Base64.decode(chosenMessage.getSubject())));
+//		String decompressedSubjectTxt = GzipUtil.decompress(Base64.decode(decryptedSubjectTxt));
+//		System.out.println("Subject text: " + new String(decompressedSubjectTxt));
+//		
+//		Document doc = DataUtil.loadDocument();
+//
+//		X509Certificate cer = (X509Certificate) keyStoreReader.getCertificateFromKeyStore(keyStore, "usera");
+//		
+//		if(DataUtil.verifySiganture(doc, cer)) {
+//			
+//			System.out.println(".... verification is successful");
+//		}
+//		
+//		System.out.println("");
+//		System.out.println("<-----TEST CASE FOR CHANGED MESSAGE CONTENT-irregular signature------>");
+//		
+//		System.out.println("Changing message content....");
+//		
+//		doc.getElementsByTagName("subject").item(0).setTextContent("changed content");
+//		
+//		if(!DataUtil.verifySiganture(doc, cer)) {
+//			
+//			System.out.println(".... verification is failed");
+//			System.out.println("");
+//		}
+//		
+//		System.out.println("Body text: " + decompressedBodyText);
+//		System.out.println("Subject text: " + new String(decompressedSubjectTxt));
 		
 	}
 }

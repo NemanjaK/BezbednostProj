@@ -2,13 +2,38 @@ package support;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class MailHelper {
 	/**
@@ -68,4 +93,44 @@ public class MailHelper {
     	
     	return message;
     }
+    
+    public static MimeMessage createMimeMessage(String reciever, String filename) throws MessagingException {
+    	
+    	Properties props = new Properties();
+	    Session session = Session.getDefaultInstance(props, null);
+    	MimeMessage message = new MimeMessage(session);
+
+    	BodyPart messageBodyPart1 = new MimeBodyPart();  
+        messageBodyPart1.setText("This message is encrypted");
+    	
+    	BodyPart messageBodyPart = new MimeBodyPart();
+    	DataSource source = new FileDataSource(filename);
+    	messageBodyPart.setDataHandler(new DataHandler(source));
+    	messageBodyPart.setFileName(filename);
+    	
+    	Multipart multipart = new MimeMultipart();
+    	multipart.addBodyPart(messageBodyPart1);
+    	multipart.addBodyPart(messageBodyPart);
+    	
+    	message.setSubject("Encrypted message");
+    	message.setRecipient(Message.RecipientType.TO, new InternetAddress(reciever));
+    	message.setContent(multipart);
+    	
+    	return message;
+    }
+    
+	public static void printEmail(Document doc) {
+		Node fc = doc.getFirstChild();
+		NodeList list = fc.getChildNodes();
+		for (int i = 0; i <list.getLength(); i++) {
+			Node node = list.item(i);
+			if("subject".equals(node.getNodeName())) {
+				System.out.println("Subject: " + node.getTextContent());
+			}
+			if("body".equals(node.getNodeName())) {
+				System.out.println("Body: " + node.getTextContent());
+			}
+		}
+	}
+    
 }
