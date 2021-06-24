@@ -88,7 +88,7 @@ public class AsymmetricKeyEncryption {
 	 * Snima DOM u XML fajl
 	 */
 	public static void saveDocument(Document doc, String senderEmail) {
-		String outFile = "./data/" + senderEmail + "_enc.xml";
+		String outFile = "./data/" + senderEmail + "_signed_enc.xml";
 
 		try {
 			File outFileF = new File(outFile);

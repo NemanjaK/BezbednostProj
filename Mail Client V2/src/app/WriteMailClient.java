@@ -46,7 +46,7 @@ public class WriteMailClient extends MailClient {
         	System.out.println("Your email:");
         	BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             String from = reader.readLine();
-            final String path = "./data/" + from + "_enc.xml";
+          //  final String path = "./data/" + from + "_enc.xml";
                 
         	System.out.println("Insert a reciever:");
             String to = reader.readLine();
@@ -57,6 +57,7 @@ public class WriteMailClient extends MailClient {
             System.out.println("Insert body:");
             String body = reader.readLine();
             
+            //kreiranje xml fajla
 			DataUtil.generateXML(from,subject, body);		
 			
         	Document doc = SignEnveloped.loadDocument(from);
@@ -74,7 +75,13 @@ public class WriteMailClient extends MailClient {
             doc2 = AsymmetricKeyEncryption.encrypt(doc2, secretKey, certTo);
             AsymmetricKeyEncryption.saveDocument(doc2, from);
             
-            MimeMessage mimeMessage = MailHelper.createMimeMessage(to, path);
+	        Document encrDoc = DataUtil.convertXMLFileToXMLDocument(from);
+	        
+	        String xmlString = DataUtil.XmlDocumentToString(encrDoc);
+	        System.out.println(xmlString);
+	        
+	        // Slanje enkriptovanog XML-a u body-ju poruke	        
+            MimeMessage mimeMessage = MailHelper.createMimeMessage(to,"Encrypted message!", xmlString);
             MailWritter.sendMessage(service, "me", mimeMessage);
            
         	

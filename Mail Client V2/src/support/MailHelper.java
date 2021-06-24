@@ -81,6 +81,7 @@ public class MailHelper {
         return null;
     }
     
+    
     public static MimeMessage createMimeMessage(String reciever,String subject, String  body) throws MessagingException {
     	
     	Properties props = new Properties();
@@ -90,31 +91,6 @@ public class MailHelper {
     	message.setRecipient(Message.RecipientType.TO, new InternetAddress(reciever));
     	message.setSubject(subject);
     	message.setText(body);
-    	
-    	return message;
-    }
-    
-    public static MimeMessage createMimeMessage(String reciever, String filename) throws MessagingException {
-    	
-    	Properties props = new Properties();
-	    Session session = Session.getDefaultInstance(props, null);
-    	MimeMessage message = new MimeMessage(session);
-
-    	BodyPart messageBodyPart1 = new MimeBodyPart();  
-        messageBodyPart1.setText("This message is encrypted");
-    	
-    	BodyPart messageBodyPart = new MimeBodyPart();
-    	DataSource source = new FileDataSource(filename);
-    	messageBodyPart.setDataHandler(new DataHandler(source));
-    	messageBodyPart.setFileName(filename);
-    	
-    	Multipart multipart = new MimeMultipart();
-    	multipart.addBodyPart(messageBodyPart1);
-    	multipart.addBodyPart(messageBodyPart);
-    	
-    	message.setSubject("Encrypted message");
-    	message.setRecipient(Message.RecipientType.TO, new InternetAddress(reciever));
-    	message.setContent(multipart);
     	
     	return message;
     }
