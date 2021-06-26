@@ -30,8 +30,6 @@ import org.w3c.dom.NodeList;
 
 public class AsymmetricKeyEncryption {
 	
-	private static final String IN_FILE = "./data/univerzitet_enc2.xml";
-	private static final String OUT_FILE = "./data/univerzitet_dec2.xml";
 	private static final String KEY_STORE_FILE = "./data/userb.jks";
 
 	static {

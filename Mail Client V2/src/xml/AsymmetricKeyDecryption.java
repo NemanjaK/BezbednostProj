@@ -24,8 +24,6 @@ import org.w3c.dom.NodeList;
 
 public class AsymmetricKeyDecryption {
 
-	//private static final String IN_FILE = "./data/univerzitet_enc2.xml";
-	//private static final String OUT_FILE = "./data/univerzitet_dec2.xml";
 	private static final String KEY_STORE_FILE = "./data/userb.jks";
 
 	static {
@@ -56,7 +54,28 @@ public class AsymmetricKeyDecryption {
 	 * Snima DOM u XML fajl
 	 */
 	public static void saveDocument(Document doc, String senderEmail) {
-		String outFile = "./data/" + senderEmail + "_dec.xml";
+		String outFile = "./data/" + senderEmail + "_recieved_dec.xml";
+
+		try {
+			File outFilef = new File(outFile);
+			FileOutputStream f = new FileOutputStream(outFilef);
+
+			TransformerFactory factory = TransformerFactory.newInstance();
+			Transformer transformer = factory.newTransformer();
+
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(f);
+
+			transformer.transform(source, result);
+
+			f.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public static void saveRecivedEncrypted(Document doc, String senderEmail) {
+		String outFile = "./data/" + senderEmail + "_recieved_encrypted.xml";
 
 		try {
 			File outFilef = new File(outFile);

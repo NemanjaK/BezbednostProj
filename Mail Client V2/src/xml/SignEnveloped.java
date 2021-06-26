@@ -26,8 +26,8 @@ import org.w3c.dom.Element;
 
 //Potpisuje dokument, koristi se enveloped tip
 public class SignEnveloped {
-	// SMISLITI STRUKTURU KODA TAKO DA RADI BEZ testIt()
-	private static final String OUT_FILE = "./data/univerzitet_signed1.xml";
+
+	//private static final String OUT_FILE = "./data/univerzitet_signed1.xml";
 	private static final String KEY_STORE_FILE = "./data/usera.jks";
 	
   static {

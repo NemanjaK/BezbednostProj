@@ -2,6 +2,7 @@ package util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -31,6 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class DataUtil {
@@ -66,10 +68,10 @@ public class DataUtil {
 	         e.printStackTrace();
 	    }
 	}
-    public static Document convertXMLFileToXMLDocument(String senderEmail) 
+	
+	public static Document convertStringToXMLDocument(String xmlString) 
     {
-    	
-		String outFile = "./data/" + senderEmail + "_signed_enc.xml";
+		Document doc = null;
         //Parser that produces DOM object trees from XML content
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
          
@@ -81,17 +83,16 @@ public class DataUtil {
             builder = factory.newDocumentBuilder();
              
             //Parse the content to Document object
-            Document xmlDocument = builder.parse(new File(outFile));
-             
-            return xmlDocument;
+            doc = builder.parse(new InputSource(new StringReader(xmlString)));
+            return doc;
         } 
         catch (Exception e) 
         {
             e.printStackTrace();
         }
-        return null;
+        return doc;
     }
-    
+
     // Konvertovanje XML dokumenta u String
     public static String XmlDocumentToString(Document xmlDocument) {
     	

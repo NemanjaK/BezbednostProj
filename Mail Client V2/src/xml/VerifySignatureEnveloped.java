@@ -31,7 +31,7 @@ public class VerifySignatureEnveloped {
 	 * Kreira DOM od XML dokumenta
 	 */
 	public static Document loadDocument(String senderEmail) {
-		String inFile = "./data/" + senderEmail + "_dec.xml";
+		String inFile = "./data/" + senderEmail + "_recieved_dec.xml";
 
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
