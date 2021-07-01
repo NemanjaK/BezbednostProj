@@ -1,5 +1,6 @@
 package ib.project.model;
 
+//DTO koji enkapsulira generisani JWT koji se vraca klijentu
 public class UserTokenState {
 	
 	private String access_token;

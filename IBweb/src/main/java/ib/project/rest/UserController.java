@@ -1,10 +1,12 @@
 package ib.project.rest;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +37,7 @@ public class UserController {
 		this.passwordEncoder = passwordEncoder;
 	}
 	
-	@GetMapping("/user/all")
+	@GetMapping
 	public List<User> getAll() {
 		return this.userService.findAll();
 	}
@@ -82,6 +84,7 @@ public class UserController {
 	
 	// User activation
 	@PutMapping(value="/activate/{id}")
+	//@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<UserDTO> activateUser(@PathVariable("id") Long id){
 		User user = userService.findById(id);
 		if(user == null) {
@@ -92,4 +95,8 @@ public class UserController {
 		return new ResponseEntity<>(new UserDTO(user),HttpStatus.OK);
 	}
 	
+	@RequestMapping("/whoami")
+	public User user(Principal user) {
+		return this.userService.findByEmail(user.getName());
+	}	
 }

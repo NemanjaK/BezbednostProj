@@ -1,15 +1,25 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-<script type="text/javascript" src="js/main.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-</head>
-<body>
-	<a href="./user_content/cat.jpg" download>Download link for static
-		files</a>
-	<button type="button"  onclick="download()">Download link for
-		target/files files</button>
-</body>
-
+	<head>
+		<meta charset="utf-8">
+		<title>Login</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/login.js"></script>
+		<link rel="stylesheet" href="css/styles.css">
+		<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+	</head>
+	<body>
+		<h1>Login	</h1><br>
+		<div id="login_form">
+		    <form name="login" method="post" id="login">
+		       	<label for="email">Email:</label><br>
+		 		<input type="text" placeholder="Enter email" id="email"><br><br>
+		 		<label for="password">Password:</label><br>
+		 		<input type="password" placeholder="Enter your password" id="password"><br><br>
+		 		<input type="submit" id="submit" value="Submit" class="button" />
+		    </form>
+		 </div><br>
+		 <a href="register.html">Registration</a>
+	</body>
 </html>
