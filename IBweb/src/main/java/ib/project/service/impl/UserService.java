@@ -24,22 +24,26 @@ public class UserService implements UserServiceInterface {
 
 	@Override
 	public User findByEmail(String email) {
-		return userRepository.findByEmail(email);
+		User u = userRepository.findByEmail(email);
+		return u;
 	}
 
 	@Override
 	public List<User> findAll() {
-		return userRepository.findAll();
+		List<User> result = userRepository.findAll();
+		return result;
 	}
 
 	@Override
 	public List<User> findByActiveTrue() {
-		return userRepository.findByActiveTrue();
+		List<User> activeU = userRepository.findByActiveTrue();
+		return activeU;
 	}
 
 	@Override
 	public List<User> findByActiveFalse() {
-		return userRepository.findByActiveFalse();
+		List<User> inactiveU = userRepository.findByActiveFalse();
+		return inactiveU;
 	}
 
 	@Override

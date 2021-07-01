@@ -5,7 +5,9 @@ $(document).ready(function(){
 	token = localStorage.getItem("token");
 	
 	// preuzmi sve korisnike
-	getAllUsers();
+	getAllUsers(token);
+
+
 	
 	$('#logout').on('click',function(e){
 		localStorage.removeItem("token");

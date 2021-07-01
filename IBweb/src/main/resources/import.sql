@@ -1,7 +1,7 @@
 
 
-INSERT INTO authority(name)VALUES('ADMIN');
-INSERT INTO authority(name)VALUES('REGULAR');
+INSERT INTO authority(name)VALUES('ROLE_ADMIN');
+INSERT INTO authority(name)VALUES('ROLE_REGULAR');
 
 INSERT INTO users(email,password,certificate,active)VALUES('nemanjak@example.com','$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra',NULL,true);
 INSERT INTO users(email,password,certificate,active)VALUES('nikola@example.com','$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra',NULL,true);

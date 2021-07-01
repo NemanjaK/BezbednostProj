@@ -77,8 +77,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/api/users/register").permitAll()
 				//!!! SAMO ZA TESTIRANJE !!!
 				//.antMatchers(HttpMethod.GET, "/**").permitAll()
+				//.antMatchers(HttpMethod.PUT, "/**").permitAll()
 				// samo korisnici sa ADMIN autoritijem mogu pristupiti putanji /api/users/activate/**
-				.antMatchers("/api/users/activate/**").hasAuthority("ADMIN")
+				//.antMatchers("/api/users/activate/**").hasAuthority("ADMIN")
 				// samo korisnici sa ADMIN autoritijem mogu pristupiti putanji /api/users/all/
 				//.antMatchers("/api/users/all").hasAuthority("ADMIN")
 				// za svaki drugi zahtev korisnik mora biti autentifikovan

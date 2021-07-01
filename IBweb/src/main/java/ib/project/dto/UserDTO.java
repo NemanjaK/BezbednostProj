@@ -1,5 +1,10 @@
 package ib.project.dto;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import ib.project.model.Authority;
 import ib.project.model.User;
 
 public class UserDTO {
@@ -9,22 +14,28 @@ public class UserDTO {
 	private String password;
 	private String certificate;
 	private boolean active;
+	private Set<String> userAuthorities = new HashSet();
 
 	public UserDTO() {
 
 	}
 
-	public UserDTO(Long id, String email, String password, String certificate, boolean active) {
+	public UserDTO(Long id, String email, String password, String certificate, boolean active,
+			Set<Authority> userAuthority) {
 		super();
 		this.id = id;
 		this.email = email;
-		this.password = password;
+		// this.password = password;
 		this.certificate = certificate;
 		this.active = active;
+		for (Authority authority : userAuthority) {
+			this.userAuthorities.add(authority.getName());
+		}
 	}
 
 	public UserDTO(User user) {
-		this(user.getId(), user.getEmail(), user.getPassword(), user.getCertificate(), user.isActive());
+		this(user.getId(), user.getEmail(), user.getPassword(), user.getCertificate(), user.isActive(),
+				user.getUserAuthorities());
 	}
 
 	public Long getId() {
@@ -66,4 +77,13 @@ public class UserDTO {
 	public void setActive(boolean active) {
 		this.active = active;
 	}
+
+	public Set<String> getUserAuthorities() {
+		return userAuthorities;
+	}
+
+	public void setUserAuthorities(Set<String> userAuthorities) {
+		this.userAuthorities = userAuthorities;
+	}
+
 }

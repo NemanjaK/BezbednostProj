@@ -31,6 +31,7 @@ function login() {
 			var token = response.access_token;
 			console.log(token);
 			localStorage.setItem("token", token);
+			whoAmI(token);
 			alert('Login OK.');
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
