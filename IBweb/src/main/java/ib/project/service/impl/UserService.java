@@ -50,4 +50,9 @@ public class UserService implements UserServiceInterface {
 	public User save(User user) {
 		return userRepository.save(user);
 	}
+
+	@Override
+	public List<User> findAllByEmail(String email) {
+		return userRepository.findAllByEmailIgnoreCaseContains(email);
+	}
 }

@@ -75,7 +75,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				// svim korisnicima dopusti da pristupe putanjama /api/auth/**, /h2-console/**, /api/demo/**
 				.authorizeRequests().antMatchers("/api/auth/**").permitAll().antMatchers("/api/demo/**").permitAll().antMatchers("/h2-console/**").permitAll()
 				.antMatchers("/api/users/register").permitAll()
-				//!!! SAMO ZA TESTIRANJE !!!
 				//.antMatchers(HttpMethod.GET, "/**").permitAll()
 				//.antMatchers(HttpMethod.PUT, "/**").permitAll()
 				// samo korisnici sa ADMIN autoritijem mogu pristupiti putanji /api/users/activate/**

@@ -1,6 +1,10 @@
 package ib.project.rest;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -28,16 +33,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import ib.project.certificate.model.IssuerData;
-import ib.project.certificate.model.SubjectData;
-import ib.project.certificate.utils.CRLManager;
-import ib.project.certificate.utils.CertificateGenerator;
-import ib.project.certificate.utils.KeyStoreCertificateGenerator;
 import ib.project.dto.UserDTO;
-import ib.project.keystore.KeyStoreWriter;
 import ib.project.model.Authority;
 import ib.project.model.User;
 import ib.project.service.AuthorityServiceInterface;
@@ -62,9 +62,9 @@ public class UserController {
 	KeyStoreService keyStoreService;
 
 	@GetMapping("/all")
-	@PreAuthorize("hasRole('ADMIN')")
-	public List<User> getAll() {
-		return this.userService.findAll();
+	// @PreAuthorize("hasRole('ADMIN')")
+	public List<User> getAll(@RequestParam(value = "email", defaultValue = "") String email) {
+		return this.userService.findAllByEmail(email);
 	}
 
 	@GetMapping(value = "/active-users")
@@ -106,9 +106,9 @@ public class UserController {
 
 		u = userService.save(u);
 
-		String email = u.getEmail();		
+		String email = u.getEmail();
 		String shortMail = email.substring(0, email.indexOf("@"));
-		
+
 		// Kreiranje KeyStore-a za korisnika
 		if (keyStoreService.generateKeyStore(u)) {
 			u.setCertificate("data/" + shortMail + ".jks");
@@ -125,7 +125,11 @@ public class UserController {
 		if (user == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		user.setActive(true);
+		if (user.isActive() == true) {
+			return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
+		} else {
+			user.setActive(true);
+		}
 		user = userService.save(user);
 		return new ResponseEntity<>(new UserDTO(user), HttpStatus.OK);
 	}
@@ -138,23 +142,62 @@ public class UserController {
 	@GetMapping(value = "/whoami/download")
 	public ResponseEntity<byte[]> download(Principal user) {
 		User u = this.userService.findByEmail(user.getName());
-		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-		Path userDir = Paths.get("data/" + u.getId() +"/keystore.jks");
+		// ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+		String email = u.getEmail();
+		String shortMail = email.substring(0, email.indexOf("@"));
 
+		Path userDir = Paths.get("data/" + shortMail + ".jks");
+		System.out.println(userDir);
 		File file = null;
 		try {
 			file = new File(userDir.toUri().toURL().getFile());
+
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("filename", "keystore.jks");
+		byte[] bFile = readBytesFromFile(file.toString());
+		System.out.println(file);
+		System.out.println(bFile);
 
-		byte[] bFile = keyStoreService.readBytesFromFile(file.toString());
+		try {
+			return ResponseEntity.ok().headers(headers).body(bFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-		return ResponseEntity.ok().headers(headers).body(bFile);
+		return new ResponseEntity<byte[]>(HttpStatus.BAD_REQUEST);
+
+	}
+
+	private static byte[] readBytesFromFile(String filePath) {
+
+		FileInputStream fileInputStream = null;
+		byte[] bytesArray = null;
+		try {
+
+			File file = new File(filePath);
+			bytesArray = new byte[(int) file.length()];
+
+			// read file into bytes[]
+			fileInputStream = new FileInputStream(file);
+			fileInputStream.read(bytesArray);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (fileInputStream != null) {
+				try {
+					fileInputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return bytesArray;
 	}
 
 }

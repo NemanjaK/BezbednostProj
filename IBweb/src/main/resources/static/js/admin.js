@@ -1,13 +1,12 @@
 var token = null;
 
 $(document).ready(function(){
-	
+	var korisniciTable = $('#korisniciTable');
+
 	token = localStorage.getItem("token");
 	
 	// preuzmi sve korisnike
-	getAllUsers(token);
-
-
+	
 	
 	$('#logout').on('click',function(e){
 		localStorage.removeItem("token");
@@ -18,38 +17,33 @@ $(document).ready(function(){
 		activateUser($(this).data('id'));
 	});
 	
-});
-
-function getAllUsers(token){
+	var emailInput = $('#email');
+	getAllUsers(token);
+	
+	function getAllUsers(token){	
+	var email = emailInput.val();
 	$.ajax({
 			headers:{"Authorization" :"Bearer " + token},
 			contentType: 'application/json',
 			type: 'GET',
 			dataType:'json',
 			crossDomain: true,
-			url:'https://localhost:8443/api/users',
-			success:function(response){
+			url:'https://localhost:8443/api/users/all?'+'email='+email,
+			success:function(data){
+				korisniciTable.empty();
 				
-				var table = $('#users tbody');
+
+				for(const user of data){
+					korisniciTable.append(
+			        `<tr>'                      
+                            '<td>${user.id}</td>'
+                            '<td>${user.email}</td>'
+                            '<td>${user.active ? "Aktivan" : "Neaktivan"}</td>'
+							'<td><button id="activate" data-id=${user.id}>Aktiviraj</button></td>';
+                       '</tr>`
+					
+					)
 				
-				// ubaci redove korisnika
-				for(var i=0; i<response.length; i++) {
-					user = response[i];
-					//console.log(user);
-					
-					var row = '<tr data-id="'+user.id+'">'+
-							'<td>'+user.id+'</td>'+
-							'<td>'+user.email+'</td>'+
-							'<td>'+user.active+'</td>';
-					// za neaktivne korisnike se ubacuje dugme za aktivaciju
-					if (!user.active)
-						var activationBtn = '<button id="activate" data-id="'+user.id+'">Aktiviraj</button>';
-					else
-						var activationBtn = '';
-					row += '<td>' + activationBtn + '</td>'+
-					'</tr>';
-					
-					table.append(row);
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) { 
@@ -58,10 +52,18 @@ function getAllUsers(token){
 			}
 		});
 }
+    emailInput.keyup(function (e) {
+        e.preventDefault();
+        getAllUsers(token);
+    });
+
+	
+});
+ 	
 
 function activateUser(id){
 	$.ajax({
-		type: 'POST',
+		type: 'PUT',
 		contentType: 'application/json',
 		headers:{"Authorization" :"Bearer " + token},
 		url: 'https://localhost:8443/api/users/activate/' + id,
@@ -70,11 +72,12 @@ function activateUser(id){
 		cache: false,
 		processData: false,
 		success:function(response){
-			location.reload();
+				alert("User activated.");
+				 location.reload();
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			console.log(jqXHR);
-			alert(textStatus);
+			alert("User already activated.");
 		}
 	});
 }
