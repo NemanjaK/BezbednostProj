@@ -35,7 +35,7 @@ public class AsymmetricKeyDecryption {
 	 * Kreira DOM od XML dokumenta
 	 */
 	public static Document loadDocument(String senderEmail) {
-		String inFile = "./data/" + senderEmail + "_enc.xml";
+		String inFile = "./data/" + senderEmail + "_recieved_encrypted.xml";
 
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
