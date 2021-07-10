@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><email>
-<subject>EE</subject>
-<body>GDE SI LEGENDO</body>
+<subject>TEST</subject>
+<body>TESTOVA</body>
 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
 <ds:SignedInfo>
 <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
@@ -11,15 +11,15 @@
 <ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
 </ds:Transforms>
 <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-<ds:DigestValue>NlB2eaeSXUXE6ChSlVxO9DJKpT4=</ds:DigestValue>
+<ds:DigestValue>xB2jVkI1woJlqsVg6F0IYxiyYp0=</ds:DigestValue>
 </ds:Reference>
 </ds:SignedInfo>
 <ds:SignatureValue>
-mjJc18m0X7iQsWa8Qtxv6sXEd8UG4WmZzCYuCJxEc5imA3eGPJhtgFiZinSxPsKNFOerIJdoA7rr
-w1k8na2NYwOjteHdKvt6QTbnetEpBv+5k/0h+XYdZWrC2jAVnBgkifLXrlBteAUZgJA7W11bmXrb
-KN+AFoBaoAJ9t36VYofNMl1dtcatvjzn89sIg4rnq1LQCK4gEQ2iffw/BdmGU7v6QZhpfJ0iMT88
-h/JcR1SHv0EVv7bxkiuI2MxSq4c/lA61SpScDSeHgfNWrcRcFSaolFUbfV1d5SiWpJzF08oSXPML
-iFXSod3L4YFOGl8mb9dR0nXOMUHXrlfPo0ewFg==
+mn1JNJ+kA1OWFP8bLPlLwE0pq9Y4bTZKLG3F/uBQNP9Jif5bX29dQblIz9R+6C7eawf1Ucz+5UnX
+nnsNXHWYkiqGoJ/uxlO8jgHrnlODCgg+ymCQ1yI+Yw+3HAUWhP0GlvyU1qPNZj13G7FOTquT/Dsb
+45crqpPppPLsQ1qAYkrex5WB1U3chq3DuGNV8a6Ak1WtND/YhS25AnK4Q2WwxFxIPt3cBoAYuHrg
+pX1eBIBdt0OGfU3RiHzg9PIXq0QFw7yXVLMRh6gw3gbTT3HIxdwyUlFj63NatX8UZ9D2GT2F0U4s
+JqTlWYm4hQjmqe2PgHxwz6t7m0ZFpE1qyGb2ZA==
 </ds:SignatureValue>
 <ds:KeyInfo>
 <ds:KeyValue>

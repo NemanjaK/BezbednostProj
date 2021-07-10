@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
 
 public class AsymmetricKeyEncryption {
 	
-	private static final String KEY_STORE_FILE = "./data/userb.jks";
+	private static final String KEY_STORE_FILE = "./data/usera.jks";
 
 	static {
 		// staticka inicijalizacija
@@ -70,8 +70,9 @@ public class AsymmetricKeyEncryption {
 			BufferedInputStream in = new BufferedInputStream(new FileInputStream(KEY_STORE_FILE));
 			ks.load(in, "123".toCharArray());
 
-			if (ks.isKeyEntry("userb")) {
+			if (ks.isKeyEntry("usera")) {
 				Certificate cert = ks.getCertificate("userb");
+				
 				return cert;
 			} else
 				return null;

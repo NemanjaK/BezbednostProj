@@ -65,8 +65,8 @@ public class WriteMailClient extends MailClient {
             Document doc2 = AsymmetricKeyEncryption.loadDocument(from);
 
             SecretKey secretKey = AsymmetricKeyEncryption.generateDataEncryptionKey();     
-            Certificate certTo = AsymmetricKeyEncryption.readCertificate();
-            doc2 = AsymmetricKeyEncryption.encrypt(doc2, secretKey, certTo);
+            Certificate cert = AsymmetricKeyEncryption.readCertificate();
+            doc2 = AsymmetricKeyEncryption.encrypt(doc2, secretKey, cert);
             AsymmetricKeyEncryption.saveDocument(doc2, from);
             
 	        // Konvertovanje enkriptovanog XML dokumenta u DOM
